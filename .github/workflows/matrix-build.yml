@@ -1,0 +1,35 @@
+name: Matrix Build with Artifacts
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # Lets you trigger it manually too
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']  # 3 variants = 3 parallel jobs
+
+    steps:
+      # Step 1: The required identifier step
+      - name: matrix-676d014
+        run: echo "Running matrix build for Python ${{ matrix.python-version }}"
+
+      # Step 2: Generate a unique artifact file for this variant
+      - name: Generate build artifact
+        run: |
+          echo "Build Report" > output.txt
+          echo "Python Version: ${{ matrix.python-version }}" >> output.txt
+          echo "Runner OS: ${{ runner.os }}" >> output.txt
+          echo "Build Time: $(date)" >> output.txt
+          echo "Job ID: ${{ github.run_id }}" >> output.txt
+
+      # Step 3: Upload the artifact with the required naming prefix
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-676d014-py${{ matrix.python-version }}
+          path: output.txt
